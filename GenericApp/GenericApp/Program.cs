@@ -9,14 +9,14 @@ namespace GenericApp
             try
             {
                 var dictionary = new MultiDictionary<MyInt, MyString>
-            {
-                {1, "one"},
-                {2, "two"},
-                {3, "three"},
-                {1, "ich"},
-                {2, "nee"},
-                {3, "sun"}
-            };
+                {
+                    {1, "one"},
+                    {2, "two"},
+                    {3, "three"},
+                    {1, "ich"},
+                    {2, "nee"},
+                    {3, "sun"}
+                };
 
                 Console.WriteLine("Initial state:");
                 DisplayDictionary(dictionary);
