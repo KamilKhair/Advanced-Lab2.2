@@ -1,35 +1,30 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace GenericApp
 {
-    public class MultiDictionary<K, V> : IMultiDictionary<K, V>, IEnumerable<KeyValuePair<K, IEnumerable<V>>> where K : struct where V : struct
+    public class MultiDictionary<K, V> : IMultiDictionary<K, V>, IEnumerable<KeyValuePair<K, IEnumerable<V>>> where K : struct where V : new()
     {
-        public MultiDictionary()
-        {
-            Dictionary = new Dictionary<K, LinkedList<V>>();
-        }
-
-        private Dictionary<K, LinkedList<V>> Dictionary { get; }
+        private readonly Dictionary<K, LinkedList<V>> _dictionary = new Dictionary<K, LinkedList<V>>();
 
         public void Add(K key, V value)
         {
-            if (!typeof(K).IsDefined(typeof(KeyAttribute)))
+            var customAttributes = typeof(K).GetCustomAttributesData();
+            if (customAttributes.All(catt => catt.AttributeType.Name != "KeyAttribute"))
             {
                 throw new CustomAttributeFormatException("CustomAttributeFormatException: The Key Type doesn't has a KeyAttribute");
             }
-
+            
             if (ContainsKey(key))
             {
-                Dictionary[key].AddLast(value);
+                _dictionary[key].AddLast(value);
+                return;
             }
-            else
-            {
-                Dictionary.Add(key, new LinkedList<V>());
-                Dictionary[key].AddFirst(value);
-            }
+            _dictionary.Add(key, new LinkedList<V>());
+            _dictionary[key].AddFirst(value);
         }
 
         public void CreateNewValue(K key)
@@ -37,60 +32,46 @@ namespace GenericApp
             
             if (ContainsKey(key))
             {
-                Dictionary[key].AddLast((V)Activator.CreateInstance(typeof(V)));
+                _dictionary[key].AddLast(new V());
+                return;
             }
-            else
-            {
-                Dictionary.Add(key, new LinkedList<V>());
-                Dictionary[key].AddFirst((V)Activator.CreateInstance(typeof(V)));
-            }
+            _dictionary.Add(key, new LinkedList<V>());
+            _dictionary[key].AddFirst(new V());
         }
 
         public bool Remove(K key)
         {
-            if (!Dictionary.ContainsKey(key))
-            {
-                return false;
-            }
-            return Dictionary.Remove(key);
+            return _dictionary.ContainsKey(key) && _dictionary.Remove(key);
         }
 
         public bool Remove(K key, V value)
         {
-            if (!Contains(key, value))
-            {
-                return false;
-            }
-            return Dictionary[key].Remove(value);
+            return Contains(key, value) && _dictionary[key].Remove(value);
         }
 
         public void Clear()
         {
-            Dictionary.Clear();
+            _dictionary.Clear();
         }
 
         public bool ContainsKey(K key)
         {
-            return Dictionary.ContainsKey(key);
+            return _dictionary.ContainsKey(key);
         }
 
         public bool Contains(K key, V value)
         {
-            if (!Dictionary.ContainsKey(key))
-            {
-                return false;
-            }
-            return Dictionary[key].Contains(value);
+            return _dictionary.ContainsKey(key) && _dictionary[key].Contains(value);
         }
 
-        public ICollection<K> Keys => Dictionary.Keys;
+        public ICollection<K> Keys => _dictionary.Keys;
 
         public ICollection<V> Values
         {
             get
             {
                 var list = new List<V>();
-                foreach (var key in Dictionary)
+                foreach (var key in _dictionary)
                 {
                     foreach (var value in key.Value)
                     {
@@ -104,18 +85,11 @@ namespace GenericApp
             }
         }
 
-        public int Count => Dictionary.Count;
+        public int Count => Values.Count;
 
         public IEnumerator<KeyValuePair<K, IEnumerable<V>>> GetEnumerator()
         {
-            var list = new List<KeyValuePair<K, IEnumerable<V>>>();
-
-            foreach (var item in Dictionary)
-            {
-                list.Add(new KeyValuePair<K, IEnumerable<V>>(item.Key, item.Value));
-            }
-
-            return list.GetEnumerator();
+            return _dictionary.Select(item => new KeyValuePair<K, IEnumerable<V>>(item.Key, item.Value)).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

@@ -10,19 +10,19 @@ namespace GenericApp
             {
                 var dictionary = new MultiDictionary<MyInt, MyString>
                 {
-                    {1, "one"},
-                    {2, "two"},
-                    {3, "three"},
-                    {1, "ich"},
-                    {2, "nee"},
-                    {3, "sun"}
+                    {1, new MyString("one")},
+                    {2, new MyString("two")},
+                    {3, new MyString("three")},
+                    {1, new MyString("ich")},
+                    {2, new MyString("nee")},
+                    {3, new MyString("sun")}
                 };
 
                 Console.WriteLine("Initial state:");
                 DisplayDictionary(dictionary);
 
                 Console.WriteLine("After Removing key = 3, value = sun:");
-                dictionary.Remove(3, "sun");
+                dictionary.Remove(3, new MyString("sun"));
                 DisplayDictionary(dictionary);
 
                 Console.WriteLine("After Removing key = 3:");
@@ -42,12 +42,12 @@ namespace GenericApp
                 DisplayDictionary(dictionary);
 
                 Console.WriteLine("Returning to Initial state:");
-                dictionary.Add(1, "one");
-                dictionary.Add(1, "ich");
-                dictionary.Add(2, "two");
-                dictionary.Add(2, "nee");
-                dictionary.Add(3, "three");
-                dictionary.Add(3, "sun");
+                dictionary.Add(1, new MyString("one"));
+                dictionary.Add(1, new MyString("ich"));
+                dictionary.Add(2, new MyString("two"));
+                dictionary.Add(2, new MyString("nee"));
+                dictionary.Add(3, new MyString("three"));
+                dictionary.Add(3, new MyString("sun"));
                 DisplayDictionary(dictionary);
 
                 Console.WriteLine("The values are:");
@@ -64,7 +64,7 @@ namespace GenericApp
                 }
 
                 Console.WriteLine();
-                Console.WriteLine(dictionary.Contains(1, "one")
+                Console.WriteLine(dictionary.Contains(1, new MyString("one"))
                     ? "The Multi Dictionary contains key = 1, value = one"
                     : "The Multi Dictionary does not contain key = 1, value = one");
 

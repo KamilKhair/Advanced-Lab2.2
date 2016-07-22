@@ -3,26 +3,26 @@
     [Key]
     public struct MyInt
     {
-        public int Value { get;}
+        private readonly int _value;
 
-        public MyInt(int d)
+        public MyInt(int value)
         {
-            Value = d;
+            _value = value;
         }
 
-        public static implicit operator MyInt(int d)
+        public static implicit operator MyInt(int value)
         {
-            return new MyInt(d);
+            return new MyInt(value);
         }
 
         public override int GetHashCode()
         {
-            return Value;
+            return _value;
         }
 
         public override string ToString()
         {
-            return Value.ToString();
+            return _value.ToString();
         }
     }
 }

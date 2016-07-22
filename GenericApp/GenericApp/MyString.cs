@@ -2,26 +2,21 @@
 {
     public struct MyString
     {
-        public string Value { get; }
+        private readonly string _value;
 
-        public MyString(string d)
+        public MyString(string value)
         {
-            Value = d;
-        }
-
-        public static implicit operator MyString(string d)
-        {
-            return new MyString(d);
+            _value = value;
         }
 
         public override int GetHashCode()
         {
-            return Value.GetHashCode();
+            return _value.GetHashCode();
         }
 
         public override string ToString()
         {
-            return Value;
+            return _value;
         }
     }
 }
